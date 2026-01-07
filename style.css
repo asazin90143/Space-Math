@@ -24,9 +24,10 @@ body {
 
 #game-container {
     position: relative;
-    width: 100vw;
+    width: 100%;
+    max-width: 500px;
     height: 100vh;
-    border: none;
+    border: 1px solid var(--neon-blue);
     background-color: var(--bg-color);
 }
 

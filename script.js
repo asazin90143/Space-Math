@@ -9,8 +9,8 @@ const ctx = canvas.getContext('2d');
 
 // Resize Canvas to Full Screen
 function resizeCanvas() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    canvas.width = canvas.clientWidth;
+    canvas.height = canvas.clientHeight;
 }
 window.addEventListener('resize', resizeCanvas);
 resizeCanvas();
@@ -100,7 +100,7 @@ function generateProblem(difficulty) {
 
 class Asteroid {
     constructor(difficulty) {
-        this.r = 30; // Radius
+        this.r = 15; // Radius (Smaller to look further away)
         this.x = Math.random() * (canvas.width - 2 * this.r) + this.r;
         this.y = -50;
         const problem = generateProblem(difficulty);
@@ -111,19 +111,9 @@ class Asteroid {
     }
 
     draw() {
-        // Draw Asteroid Body
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
-        ctx.fillStyle = '#333';
-        ctx.fill();
-        ctx.strokeStyle = '#fff';
-        ctx.lineWidth = 2;
-        ctx.stroke();
-        ctx.closePath();
-
         // Draw Math Problem
         ctx.fillStyle = '#00f3ff';
-        ctx.font = 'bold 20px Courier New';
+        ctx.font = 'bold 16px Courier New';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillText(this.problemText, this.x, this.y);
