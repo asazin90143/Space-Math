@@ -4,17 +4,20 @@
 
 ## 🎮 How to Play
 
-1. **Start:** Select your difficulty (Easy, Medium, or Hard) and click "Start Mission".
-2. **Defend:** Asteroids will fall from the top of the screen. Each asteroid contains a math equation.
-3. **Shoot:** Type the numeric answer to the equation using your keyboard and press **ENTER**.
-4. **Survive:** If an asteroid hits the bottom of the screen, you lose a life. The game ends when you lose 3 lives.
+1. **Customize:** Select your difficulty speed (Easy, Medium, Hard) and choose which math operations to practice (+, -, *, ÷).
+2. **Start:** Click "Start Mission" to begin.
+3. **Defend:** Asteroids will fall from the top of the screen. Each asteroid contains a math equation.
+4. **Shoot:** Type the numeric answer to the equation using your keyboard and press **ENTER**.
+5. **Pause:** Press **ESC** or click the pause button (II) if you need a break.
+6. **Survive:** If an asteroid hits the bottom of the screen, you lose a life. The game ends when you lose 3 lives.
 
 ## ⚙️ Features
 
-* **3 Difficulty Modes:**
-  * *Easy:* Addition & Subtraction (Numbers 1-10)
-  * *Medium:* Adds Multiplication (Numbers 1-20)
-  * *Hard:* Adds Division (Numbers 1-50)
+* **Customizable Difficulty:**
+  * *Speed:* Choose between Easy (Slow), Medium (Normal), or Hard (Fast).
+  * *Operations:* Toggle specific math types: Addition, Subtraction, Multiplication, Division.
+* **Portrait Mode:** Optimized for a focused, mobile-style view.
+* **Pause System:** Pause and resume gameplay at any time.
 * **High Score System:** Saves your best score locally in your browser.
 * **Progressive Difficulty:** The asteroids spawn faster as your score increases.
 
