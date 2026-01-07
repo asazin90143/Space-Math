@@ -126,6 +126,7 @@ button:hover {
     margin-top: 0;
     z-index: 20;
     pointer-events: auto;
+    display: none;
 }
 
 .operations-select {

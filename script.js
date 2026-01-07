@@ -150,6 +150,7 @@ function startGame() {
     ui.startScreen.classList.remove('active');
     ui.gameOverScreen.classList.remove('active');
     ui.pauseScreen.classList.remove('active');
+    ui.pauseBtn.style.display = 'block';
 
     // Start Loop
     requestAnimationFrame(gameLoop);
@@ -167,6 +168,7 @@ function gameOver() {
 
     ui.finalScore.innerText = state.score;
     ui.gameOverScreen.classList.add('active');
+    ui.pauseBtn.style.display = 'none';
 }
 
 function togglePause() {
@@ -186,6 +188,7 @@ function returnToMenu() {
     ui.pauseScreen.classList.remove('active');
     ui.gameOverScreen.classList.remove('active');
     ui.startScreen.classList.add('active');
+    ui.pauseBtn.style.display = 'none';
 }
 
 function gameLoop(timestamp) {
