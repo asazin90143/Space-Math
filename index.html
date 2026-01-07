@@ -11,13 +11,14 @@
 <body>
 
     <div id="game-container">
-        <canvas id="gameCanvas" width="800" height="600"></canvas>
+        <canvas id="gameCanvas"></canvas>
 
         <div id="ui-layer">
             <div id="score-board">Score: <span id="score">0</span></div>
             <div id="high-score-board">High Score: <span id="high-score">0</span></div>
             <div id="lives-board">Lives: <span id="lives">3</span></div>
             <div id="input-display">Input: <span id="current-input"></span><span class="cursor">|</span></div>
+            <button id="pause-btn">II</button>
         </div>
 
         <div id="start-screen" class="screen active">
@@ -27,10 +28,17 @@
             <div class="difficulty-select">
                 <label>Difficulty:</label>
                 <select id="difficulty">
-                    <option value="easy">Easy (+ / -)</option>
-                    <option value="medium">Medium (+ / - / *)</option>
-                    <option value="hard">Hard (+ / - / * / ÷)</option>
+                    <option value="easy">Easy (Slow)</option>
+                    <option value="medium">Medium (Normal)</option>
+                    <option value="hard">Hard (Fast)</option>
                 </select>
+            </div>
+
+            <div class="operations-select">
+                <label><input type="checkbox" name="op" value="+" checked> Addition (+)</label>
+                <label><input type="checkbox" name="op" value="-"> Subtraction (-)</label>
+                <label><input type="checkbox" name="op" value="*"> Multiplication (*)</label>
+                <label><input type="checkbox" name="op" value="/"> Division (÷)</label>
             </div>
 
             <button id="start-btn">START MISSION</button>
@@ -40,6 +48,12 @@
             <h1>GAME OVER</h1>
             <p>Final Score: <span id="final-score">0</span></p>
             <button id="restart-btn">TRY AGAIN</button>
+        </div>
+
+        <div id="pause-screen" class="screen">
+            <h1>PAUSED</h1>
+            <button id="resume-btn">RESUME</button>
+            <button id="menu-btn">MAIN MENU</button>
         </div>
     </div>
 

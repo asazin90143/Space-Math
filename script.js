@@ -7,9 +7,18 @@
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
+// Resize Canvas to Full Screen
+function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+}
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+
 // Game State Object
 const state = {
     isPlaying: false,
+    isPaused: false,
     score: 0,
     lives: 3,
     level: 1,
@@ -18,26 +27,30 @@ const state = {
     spawnRate: 2000, // ms
     lastSpawnTime: 0,
     difficulty: 'easy',
+    ops: ['+'], // Default
     highScore: localStorage.getItem('spaceMathHighScore') || 0
 };
 
 // Difficulty Settings
 const settings = {
-    easy: { speed: 0.5, maxNum: 10, ops: ['+', '-'] },
-    medium: { speed: 1.0, maxNum: 20, ops: ['+', '-', '*'] },
-    hard: { speed: 1.5, maxNum: 50, ops: ['+', '-', '*', '/'] }
+    easy: { speed: 0.3, maxNum: 10 },   // Slower speed
+    medium: { speed: 0.7, maxNum: 20 }, // Slower speed
+    hard: { speed: 1.2, maxNum: 50 }    // Slower speed
 };
 
 // UI Elements
 const ui = {
     startScreen: document.getElementById('start-screen'),
     gameOverScreen: document.getElementById('game-over-screen'),
+    pauseScreen: document.getElementById('pause-screen'),
     score: document.getElementById('score'),
     highScore: document.getElementById('high-score'),
     finalScore: document.getElementById('final-score'),
     lives: document.getElementById('lives'),
     input: document.getElementById('current-input'),
-    difficultySelect: document.getElementById('difficulty')
+    difficultySelect: document.getElementById('difficulty'),
+    pauseBtn: document.getElementById('pause-btn'),
+    opCheckboxes: document.querySelectorAll('input[name="op"]')
 };
 
 // Initialize High Score UI
@@ -47,7 +60,7 @@ ui.highScore.innerText = state.highScore;
 
 function generateProblem(difficulty) {
     const config = settings[difficulty];
-    const operator = config.ops[Math.floor(Math.random() * config.ops.length)];
+    const operator = state.ops[Math.floor(Math.random() * state.ops.length)];
     let num1 = Math.floor(Math.random() * config.maxNum) + 1;
     let num2 = Math.floor(Math.random() * config.maxNum) + 1;
     let answer = 0;
@@ -123,11 +136,22 @@ class Asteroid {
 
 function startGame() {
     state.difficulty = ui.difficultySelect.value;
+
+    // Get selected operations
+    const selectedOps = [];
+    ui.opCheckboxes.forEach(cb => {
+        if (cb.checked) selectedOps.push(cb.value);
+    });
+
+    // Default to addition if nothing selected
+    state.ops = selectedOps.length > 0 ? selectedOps : ['+'];
+
     state.score = 0;
     state.lives = 3;
     state.currentInput = '';
     state.asteroids = [];
     state.isPlaying = true;
+    state.isPaused = false;
 
     // Update UI
     ui.score.innerText = '0';
@@ -135,6 +159,7 @@ function startGame() {
     ui.input.innerText = '';
     ui.startScreen.classList.remove('active');
     ui.gameOverScreen.classList.remove('active');
+    ui.pauseScreen.classList.remove('active');
 
     // Start Loop
     requestAnimationFrame(gameLoop);
@@ -154,8 +179,31 @@ function gameOver() {
     ui.gameOverScreen.classList.add('active');
 }
 
+function togglePause() {
+    if (!state.isPlaying) return;
+    state.isPaused = !state.isPaused;
+
+    if (state.isPaused) {
+        ui.pauseScreen.classList.add('active');
+    } else {
+        ui.pauseScreen.classList.remove('active');
+    }
+}
+
+function returnToMenu() {
+    state.isPlaying = false;
+    state.isPaused = false;
+    ui.pauseScreen.classList.remove('active');
+    ui.gameOverScreen.classList.remove('active');
+    ui.startScreen.classList.add('active');
+}
+
 function gameLoop(timestamp) {
     if (!state.isPlaying) return;
+    if (state.isPaused) {
+        requestAnimationFrame(gameLoop);
+        return;
+    }
 
     // Clear Canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -197,6 +245,7 @@ function gameLoop(timestamp) {
 
 window.addEventListener('keydown', (e) => {
     if (!state.isPlaying) return;
+    if (state.isPaused) return;
 
     // Handle Numbers
     if (e.key >= '0' && e.key <= '9') {
@@ -213,6 +262,10 @@ window.addEventListener('keydown', (e) => {
     // Handle Enter (Submit)
     else if (e.key === 'Enter') {
         checkAnswer();
+    }
+    // Handle Escape (Pause)
+    else if (e.key === 'Escape') {
+        togglePause();
     }
 
     // Update UI
@@ -253,3 +306,6 @@ function checkAnswer() {
 // Button Listeners
 document.getElementById('start-btn').addEventListener('click', startGame);
 document.getElementById('restart-btn').addEventListener('click', startGame);
+document.getElementById('pause-btn').addEventListener('click', togglePause);
+document.getElementById('resume-btn').addEventListener('click', togglePause);
+document.getElementById('menu-btn').addEventListener('click', returnToMenu);

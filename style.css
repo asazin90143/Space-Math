@@ -24,10 +24,9 @@ body {
 
 #game-container {
     position: relative;
-    width: 800px;
-    height: 600px;
-    box-shadow: 0 0 20px rgba(0, 243, 255, 0.2);
-    border: 2px solid var(--neon-blue);
+    width: 100vw;
+    height: 100vh;
+    border: none;
     background-color: var(--bg-color);
 }
 
@@ -115,6 +114,24 @@ button:hover {
     background: var(--neon-blue);
     color: var(--bg-color);
     box-shadow: 0 0 15px var(--neon-blue);
+}
+
+#pause-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    padding: 10px 20px;
+    font-size: 20px;
+    margin-top: 0;
+    z-index: 20;
+}
+
+.operations-select {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 15px 0;
+    text-align: left;
 }
 
 .difficulty-select {
