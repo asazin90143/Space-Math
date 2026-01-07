@@ -1,0 +1,142 @@
+:root {
+    --bg-color: #0f0f23;
+    --neon-blue: #00f3ff;
+    --neon-pink: #ff00ff;
+    --neon-green: #00ff66;
+    --text-color: #ffffff;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+body {
+    background-color: #050510;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow: hidden;
+}
+
+#game-container {
+    position: relative;
+    width: 800px;
+    height: 600px;
+    box-shadow: 0 0 20px rgba(0, 243, 255, 0.2);
+    border: 2px solid var(--neon-blue);
+    background-color: var(--bg-color);
+}
+
+canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+/* UI Overlays */
+#ui-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    /* Let clicks pass through to canvas if needed */
+    padding: 20px;
+}
+
+#score-board,
+#lives-board,
+#high-score-board {
+    font-size: 20px;
+    color: var(--text-color);
+    font-weight: bold;
+    text-shadow: 0 0 5px var(--neon-blue);
+    margin-bottom: 10px;
+}
+
+#input-display {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 32px;
+    color: var(--neon-green);
+    background: rgba(0, 0, 0, 0.8);
+    padding: 10px 20px;
+    border: 1px solid var(--neon-green);
+    border-radius: 5px;
+}
+
+/* Screens (Start / Game Over) */
+.screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(15, 15, 35, 0.95);
+    display: none;
+    /* Hidden by default */
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: var(--text-color);
+    z-index: 10;
+}
+
+.screen.active {
+    display: flex;
+}
+
+h1 {
+    font-size: 60px;
+    color: var(--neon-pink);
+    text-shadow: 4px 4px 0px var(--neon-blue);
+    margin-bottom: 20px;
+}
+
+button {
+    background: transparent;
+    border: 2px solid var(--neon-blue);
+    color: var(--neon-blue);
+    padding: 15px 30px;
+    font-size: 24px;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: all 0.3s;
+}
+
+button:hover {
+    background: var(--neon-blue);
+    color: var(--bg-color);
+    box-shadow: 0 0 15px var(--neon-blue);
+}
+
+.difficulty-select {
+    margin: 20px 0;
+    font-size: 18px;
+}
+
+select {
+    padding: 5px;
+    font-size: 16px;
+    background: #000;
+    color: #fff;
+    border: 1px solid var(--neon-blue);
+}
+
+/* Blinking Cursor Animation */
+.cursor {
+    animation: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+    50% {
+        opacity: 0;
+    }
+}
