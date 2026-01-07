@@ -125,6 +125,7 @@ button:hover {
     font-size: 20px;
     margin-top: 0;
     z-index: 20;
+    pointer-events: auto;
 }
 
 .operations-select {

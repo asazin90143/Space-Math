@@ -296,6 +296,7 @@ function checkAnswer() {
 // Button Listeners
 document.getElementById('start-btn').addEventListener('click', startGame);
 document.getElementById('restart-btn').addEventListener('click', startGame);
+document.getElementById('game-over-menu-btn').addEventListener('click', returnToMenu);
 document.getElementById('pause-btn').addEventListener('click', togglePause);
 document.getElementById('resume-btn').addEventListener('click', togglePause);
 document.getElementById('menu-btn').addEventListener('click', returnToMenu);
