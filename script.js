@@ -49,8 +49,7 @@ const ui = {
     lives: document.getElementById('lives'),
     input: document.getElementById('current-input'),
     difficultySelect: document.getElementById('difficulty'),
-    pauseBtn: document.getElementById('pause-btn'),
-    opCheckboxes: document.querySelectorAll('input[name="op"]')
+    pauseBtn: document.getElementById('pause-btn')
 };
 
 // Initialize High Score UI
@@ -128,8 +127,9 @@ function startGame() {
     state.difficulty = ui.difficultySelect.value;
 
     // Get selected operations
+    const opCheckboxes = document.querySelectorAll('input[name="op"]');
     const selectedOps = [];
-    ui.opCheckboxes.forEach(cb => {
+    opCheckboxes.forEach(cb => {
         if (cb.checked) selectedOps.push(cb.value);
     });
 
