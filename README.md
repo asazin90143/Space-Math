@@ -22,7 +22,7 @@
 
 ### Option 1: Play Online (GitHub Pages)
 
-*(Once you deploy, paste your URL here, e.g., <https://yourusername.github.io/space-math>)*
+*(Once you deploy, paste your URL here, e.g., <https://asazin90143.github.io/Space-Math>)*
 
 ### Option 2: Run Locally
 
