@@ -363,24 +363,49 @@ function gameLoop(timestamp) {
 
     // Draw Active Effects
     const now = performance.now();
+
+    // Draw Power-Up Timers
+    let barY = 60;
+    const drawTimer = (label, color, until, maxDuration) => {
+        const remaining = until - now;
+        if (remaining > 0) {
+            const barW = 150;
+            const barH = 15;
+            const x = 10;
+
+            // Background
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+            ctx.fillRect(x, barY, barW, barH);
+
+            // Fill
+            const pct = Math.min(1, Math.max(0, remaining / maxDuration));
+            ctx.fillStyle = color;
+            ctx.fillRect(x, barY, barW * pct, barH);
+
+            // Border
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(x, barY, barW, barH);
+
+            // Text
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 10px Courier New';
+            ctx.textAlign = 'left';
+            ctx.fillText(label, x + 5, barY + 11);
+
+            barY += 25;
+        }
+    };
+
+    drawTimer("SHIELD", "#FFD700", state.shieldedUntil, 10000);
+    drawTimer("FREEZE", "#4488FF", state.frozenUntil, 5000);
+    drawTimer("SLOW MO", "#A020F0", state.slowMoUntil, 5000);
+    drawTimer("2X POINTS", "#FF00FF", state.doublePointsUntil, 10000);
+
+    // Shield Bottom Overlay
     if (now < state.shieldedUntil) {
         ctx.fillStyle = 'rgba(255, 215, 0, 0.2)';
         ctx.fillRect(0, canvas.height - 20, canvas.width, 20);
-        ctx.fillStyle = '#FFD700';
-        ctx.font = 'bold 14px Courier New';
-        ctx.fillText("SHIELD ACTIVE", canvas.width / 2, canvas.height - 30);
-    }
-    if (now < state.frozenUntil) {
-        ctx.fillStyle = '#4488FF';
-        ctx.fillText("❄️ FROZEN ❄️", canvas.width / 2, 80);
-    }
-    if (now < state.slowMoUntil) {
-        ctx.fillStyle = '#A020F0';
-        ctx.fillText("⏳ SLOW MOTION ⏳", canvas.width / 2, 110);
-    }
-    if (now < state.doublePointsUntil) {
-        ctx.fillStyle = '#FF00FF';
-        ctx.fillText("✖️ 2X POINTS ✖️", canvas.width / 2, 140);
     }
 
     // Spawn Asteroids
