@@ -34,6 +34,8 @@ const state = {
     ops: ['+'], // Default
     isMuted: false,
     nextBossScore: 200,
+    frozenUntil: 0,
+    shieldedUntil: 0,
     highScore: localStorage.getItem('spaceMathHighScore') || 0
 };
 
@@ -43,6 +45,14 @@ const settings = {
     medium: { speed: 0.7, maxNum: 20 }, // Slower speed
     hard: { speed: 1.2, maxNum: 50 }    // Slower speed
 };
+
+// Power-Up Configuration
+const powerUpTypes = [
+    { type: 'explosion', color: '#FFA500', chance: 0.05 }, // Orange: Destroys all
+    { type: 'freeze', color: '#4488FF', chance: 0.10 },    // Blue: Stops time
+    { type: 'shield', color: '#FFD700', chance: 0.10 },    // Gold: Protects bottom
+    { type: 'life', color: '#00FF00', chance: 0.05 }       // Green: +1 Life
+];
 
 // UI Elements
 const ui = {
@@ -198,7 +208,28 @@ class Asteroid {
         this.x = Math.random() * (maxX - minX) + minX;
         this.y = -50;
         this.speed = isBoss ? 0.3 : settings[difficulty].speed + (Math.random() * 0.5); // Boss is slower
-        this.color = isBoss ? '#ff0055' : '#fff';
+        
+        // Determine Power-Up
+        this.powerUp = null;
+        if (!isBoss) {
+            const rand = Math.random();
+            let cumulative = 0;
+            for (const p of powerUpTypes) {
+                cumulative += p.chance;
+                if (rand < cumulative) {
+                    this.powerUp = p.type;
+                    this.color = p.color;
+                    break;
+                }
+            }
+        }
+        
+        // Set Default Colors if no power-up
+        if (this.isBoss) {
+            this.color = '#ff0055';
+        } else if (!this.powerUp) {
+            this.color = '#00f3ff'; // Standard Neon Blue
+        }
     }
 
     draw() {
@@ -214,7 +245,7 @@ class Asteroid {
         }
 
         // Draw Math Problem
-        ctx.fillStyle = this.isBoss ? '#ff0055' : '#00f3ff';
+        ctx.fillStyle = this.color;
         ctx.font = this.isBoss ? 'bold 24px Courier New' : 'bold 16px Courier New';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
@@ -222,6 +253,7 @@ class Asteroid {
     }
 
     update() {
+        if (performance.now() < state.frozenUntil) return; // Freeze effect
         this.y += this.speed;
     }
 }
@@ -246,6 +278,8 @@ function startGame() {
     state.lives = 3;
     state.nextBossScore = 200;
     state.currentInput = '';
+    state.frozenUntil = 0;
+    state.shieldedUntil = 0;
     state.asteroids = [];
     state.particles = [];
     state.isPlaying = true;
@@ -314,6 +348,20 @@ function gameLoop(timestamp) {
     // Clear Canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+    // Draw Active Effects
+    const now = performance.now();
+    if (now < state.shieldedUntil) {
+        ctx.fillStyle = 'rgba(255, 215, 0, 0.2)';
+        ctx.fillRect(0, canvas.height - 20, canvas.width, 20);
+        ctx.fillStyle = '#FFD700';
+        ctx.font = 'bold 14px Courier New';
+        ctx.fillText("SHIELD ACTIVE", canvas.width / 2, canvas.height - 30);
+    }
+    if (now < state.frozenUntil) {
+        ctx.fillStyle = '#4488FF';
+        ctx.fillText("❄️ FROZEN ❄️", canvas.width / 2, 80);
+    }
+
     // Spawn Asteroids
     if (timestamp - state.lastSpawnTime > state.spawnRate) {
         // Check for Boss Spawn
@@ -337,6 +385,12 @@ function gameLoop(timestamp) {
 
         // Check if hit bottom
         if (asteroid.y - asteroid.r > canvas.height) {
+            // Shield Protection
+            if (performance.now() < state.shieldedUntil) {
+                state.asteroids.splice(i, 1);
+                continue;
+            }
+
             state.lives--;
             ui.lives.innerText = state.lives;
             state.asteroids.splice(i, 1); // Remove asteroid
@@ -397,6 +451,42 @@ window.addEventListener('keydown', (e) => {
     ui.input.innerText = state.currentInput;
 });
 
+function activatePowerUp(type) {
+    const now = performance.now();
+    
+    switch (type) {
+        case 'explosion':
+            // Destroy all non-boss asteroids
+            for (let i = state.asteroids.length - 1; i >= 0; i--) {
+                if (!state.asteroids[i].isBoss) {
+                    // Create particles for them
+                    const a = state.asteroids[i];
+                    for (let j = 0; j < 10; j++) {
+                        state.particles.push(new Particle(a.x, a.y, '#FFA500'));
+                    }
+                    state.asteroids.splice(i, 1);
+                    state.score += 5;
+                }
+            }
+            ui.score.innerText = state.score;
+            playExplosionSound();
+            break;
+            
+        case 'freeze':
+            state.frozenUntil = now + 5000; // 5 Seconds
+            break;
+            
+        case 'shield':
+            state.shieldedUntil = now + 10000; // 10 Seconds
+            break;
+            
+        case 'life':
+            state.lives++;
+            ui.lives.innerText = state.lives;
+            break;
+    }
+}
+
 function checkAnswer() {
     const value = parseInt(state.currentInput);
     if (isNaN(value)) return;
@@ -420,11 +510,16 @@ function checkAnswer() {
         // Spawn particles at the asteroid's position
         const hitAsteroid = state.asteroids[hitIndex];
         const pCount = hitAsteroid.isBoss ? 50 : 15;
-        const pColor = hitAsteroid.isBoss ? '#ff0055' : '#00f3ff';
+        const pColor = hitAsteroid.color;
         for (let i = 0; i < pCount; i++) {
             state.particles.push(new Particle(hitAsteroid.x, hitAsteroid.y, pColor));
         }
         playLaserSound();
+
+        // Activate Power-Up if present
+        if (hitAsteroid.powerUp) {
+            activatePowerUp(hitAsteroid.powerUp);
+        }
 
         state.asteroids.splice(hitIndex, 1);
         state.score += hitAsteroid.isBoss ? 50 : 10; // Bonus points for boss
