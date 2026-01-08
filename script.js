@@ -370,35 +370,40 @@ function gameLoop(timestamp) {
     const now = performance.now();
 
     // Draw Power-Up Timers
-    let barY = 60;
+    let timerY = 80; // Start below pause button
     const drawTimer = (label, color, until, maxDuration) => {
         const remaining = until - now;
         if (remaining > 0) {
-            const barW = 150;
-            const barH = 15;
-            const x = 10;
+            const radius = 15;
+            const x = canvas.width - 40; // Right aligned
+            const y = timerY;
 
-            // Background
+            // Background Circle
+            ctx.beginPath();
+            ctx.arc(x, y, radius, 0, Math.PI * 2);
             ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
-            ctx.fillRect(x, barY, barW, barH);
-
-            // Fill
-            const pct = Math.min(1, Math.max(0, remaining / maxDuration));
-            ctx.fillStyle = color;
-            ctx.fillRect(x, barY, barW * pct, barH);
-
-            // Border
+            ctx.fill();
             ctx.strokeStyle = '#fff';
-            ctx.lineWidth = 1;
-            ctx.strokeRect(x, barY, barW, barH);
+            ctx.lineWidth = 2;
+            ctx.stroke();
 
-            // Text
+            // Pie Slice (Progress)
+            const pct = Math.min(1, Math.max(0, remaining / maxDuration));
+
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+            ctx.arc(x, y, radius, -Math.PI / 2, -Math.PI / 2 + (Math.PI * 2 * pct));
+            ctx.lineTo(x, y);
+            ctx.fillStyle = color;
+            ctx.fill();
+
+            // Label
             ctx.fillStyle = '#fff';
             ctx.font = 'bold 10px Courier New';
-            ctx.textAlign = 'left';
-            ctx.fillText(label, x + 5, barY + 11);
+            ctx.textAlign = 'center';
+            ctx.fillText(label, x, y + radius + 12);
 
-            barY += 25;
+            timerY += 50; // Spacing
         }
     };
 
