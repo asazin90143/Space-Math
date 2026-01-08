@@ -418,8 +418,17 @@ function gameLoop(timestamp) {
         ctx.fillRect(0, canvas.height - 20, canvas.width, 20);
     }
 
+    // Calculate effective spawn rate based on Slow Mo
+    let currentSpawnRate = state.spawnRate;
+    if (now < state.slowMoUntil) {
+        currentSpawnRate *= 4; // Spawn 4x slower to match 0.25x movement speed
+    }
+
     // Spawn Asteroids
-    if (timestamp - state.lastSpawnTime > state.spawnRate) {
+    if (now < state.frozenUntil) {
+        // Pause spawning logic while frozen so they don't clump
+        state.lastSpawnTime = timestamp;
+    } else if (timestamp - state.lastSpawnTime > currentSpawnRate) {
         // Check for Boss Spawn
         if (state.score >= state.nextBossScore) {
             state.asteroids.push(new Asteroid(state.difficulty, true));
