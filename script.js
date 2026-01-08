@@ -36,6 +36,8 @@ const state = {
     nextBossScore: 200,
     frozenUntil: 0,
     shieldedUntil: 0,
+    slowMoUntil: 0,
+    doublePointsUntil: 0,
     highScore: localStorage.getItem('spaceMathHighScore') || 0
 };
 
@@ -52,7 +54,9 @@ const powerUpTypes = [
     { type: 'explosion', color: '#FFA500', chance: 0.05 }, // Orange: Destroys all
     { type: 'freeze', color: '#4488FF', chance: 0.10 },    // Blue: Stops time
     { type: 'shield', color: '#FFD700', chance: 0.10 },    // Gold: Protects bottom
-    { type: 'life', color: '#00FF00', chance: 0.05 }       // Green: +1 Life
+    { type: 'life', color: '#00FF00', chance: 0.05 },      // Green: +1 Life
+    { type: 'slowMo', color: '#A020F0', chance: 0.10 },    // Purple: Slows time
+    { type: 'doublePoints', color: '#FF00FF', chance: 0.05 } // Pink: 2x Points
 ];
 
 // UI Elements
@@ -255,7 +259,13 @@ class Asteroid {
 
     update() {
         if (performance.now() < state.frozenUntil) return; // Freeze effect
-        this.y += this.speed;
+
+        let moveSpeed = this.speed;
+        if (performance.now() < state.slowMoUntil) {
+            moveSpeed *= 0.25; // Slow down to 25% speed
+        }
+
+        this.y += moveSpeed;
     }
 }
 
@@ -281,6 +291,8 @@ function startGame() {
     state.currentInput = '';
     state.frozenUntil = 0;
     state.shieldedUntil = 0;
+    state.slowMoUntil = 0;
+    state.doublePointsUntil = 0;
     state.asteroids = [];
     state.particles = [];
     state.isPlaying = true;
@@ -361,6 +373,14 @@ function gameLoop(timestamp) {
     if (now < state.frozenUntil) {
         ctx.fillStyle = '#4488FF';
         ctx.fillText("❄️ FROZEN ❄️", canvas.width / 2, 80);
+    }
+    if (now < state.slowMoUntil) {
+        ctx.fillStyle = '#A020F0';
+        ctx.fillText("⏳ SLOW MOTION ⏳", canvas.width / 2, 110);
+    }
+    if (now < state.doublePointsUntil) {
+        ctx.fillStyle = '#FF00FF';
+        ctx.fillText("✖️ 2X POINTS ✖️", canvas.width / 2, 140);
     }
 
     // Spawn Asteroids
@@ -477,6 +497,14 @@ function activatePowerUp(type) {
             state.shieldedUntil = now + 10000; // 10 Seconds
             break;
 
+        case 'slowMo':
+            state.slowMoUntil = now + 5000; // 5 Seconds
+            break;
+
+        case 'doublePoints':
+            state.doublePointsUntil = now + 10000; // 10 Seconds
+            break;
+
         case 'life':
             state.lives++;
             ui.lives.innerText = state.lives;
@@ -519,7 +547,11 @@ function checkAnswer() {
         }
 
         state.asteroids.splice(hitIndex, 1);
-        state.score += hitAsteroid.isBoss ? 50 : 10; // Bonus points for boss
+
+        let points = hitAsteroid.isBoss ? 50 : 10;
+        if (performance.now() < state.doublePointsUntil) points *= 2;
+
+        state.score += points; // Bonus points for boss
         ui.score.innerText = state.score;
 
         // Level Up Notification every 50 points
