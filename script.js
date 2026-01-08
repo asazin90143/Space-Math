@@ -24,6 +24,7 @@ const state = {
     level: 1,
     currentInput: '',
     asteroids: [],
+    particles: [],
     spawnRate: 2000, // ms
     lastSpawnTime: 0,
     difficulty: 'easy',
@@ -97,6 +98,34 @@ function generateProblem(difficulty) {
 
 // --- Game Loop Functions ---
 
+// --- Particle System ---
+class Particle {
+    constructor(x, y, color) {
+        this.x = x;
+        this.y = y;
+        // Random velocity in all directions
+        this.vx = (Math.random() - 0.5) * 5; 
+        this.vy = (Math.random() - 0.5) * 5; 
+        this.life = 1.0; // Opacity (starts at 100%)
+        this.color = color;
+    }
+
+    update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        this.life -= 0.02; // Fade out speed
+    }
+
+    draw() {
+        ctx.globalAlpha = this.life; // Set transparency
+        ctx.fillStyle = this.color;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, 3, 0, Math.PI * 2); // Tiny circle
+        ctx.fill();
+        ctx.globalAlpha = 1.0; // Reset transparency for other objects
+    }
+}
+
 class Asteroid {
     constructor(difficulty) {
         this.r = 15; // Radius (Smaller to look further away)
@@ -149,6 +178,7 @@ function startGame() {
     state.lives = 3;
     state.currentInput = '';
     state.asteroids = [];
+    state.particles = [];
     state.isPlaying = true;
     state.isPaused = false;
 
@@ -240,6 +270,18 @@ function gameLoop(timestamp) {
         }
     }
 
+    // --- Update & Draw Particles ---
+    for (let i = state.particles.length - 1; i >= 0; i--) {
+        const p = state.particles[i];
+        p.update();
+        p.draw();
+        
+        // Remove dead particles
+        if (p.life <= 0) {
+            state.particles.splice(i, 1);
+        }
+    }
+
     requestAnimationFrame(gameLoop);
 }
 
@@ -294,6 +336,12 @@ function checkAnswer() {
 
     if (hitIndex !== -1) {
         // HIT!
+        // Spawn particles at the asteroid's position
+        const hitAsteroid = state.asteroids[hitIndex];
+        for (let i = 0; i < 15; i++) {
+            state.particles.push(new Particle(hitAsteroid.x, hitAsteroid.y, '#00f3ff'));
+        }
+
         state.asteroids.splice(hitIndex, 1);
         state.score += 10;
         ui.score.innerText = state.score;
