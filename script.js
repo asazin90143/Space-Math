@@ -15,6 +15,9 @@ function resizeCanvas() {
 window.addEventListener('resize', resizeCanvas);
 resizeCanvas();
 
+// Audio Context (Synthesized Sound)
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
 // Game State Object
 const state = {
     isPlaying: false,
@@ -29,6 +32,7 @@ const state = {
     lastSpawnTime: 0,
     difficulty: 'easy',
     ops: ['+'], // Default
+    isMuted: false,
     highScore: localStorage.getItem('spaceMathHighScore') || 0
 };
 
@@ -50,7 +54,8 @@ const ui = {
     lives: document.getElementById('lives'),
     input: document.getElementById('current-input'),
     difficultySelect: document.getElementById('difficulty'),
-    pauseBtn: document.getElementById('pause-btn')
+    pauseBtn: document.getElementById('pause-btn'),
+    muteBtn: document.getElementById('mute-btn')
 };
 
 // Initialize High Score UI
@@ -96,6 +101,28 @@ function generateProblem(difficulty) {
     return { text, answer };
 }
 
+// --- Audio Logic ---
+function playLaserSound() {
+    if (state.isMuted) return;
+
+    // Create oscillator for retro pew-pew sound
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(880, audioCtx.currentTime); // Start high
+    osc.frequency.exponentialRampToValueAtTime(110, audioCtx.currentTime + 0.15); // Drop fast
+
+    gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.15);
+
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.15);
+}
+
 // --- Game Loop Functions ---
 
 // --- Particle System ---
@@ -104,8 +131,8 @@ class Particle {
         this.x = x;
         this.y = y;
         // Random velocity in all directions
-        this.vx = (Math.random() - 0.5) * 5; 
-        this.vy = (Math.random() - 0.5) * 5; 
+        this.vx = (Math.random() - 0.5) * 5;
+        this.vy = (Math.random() - 0.5) * 5;
         this.life = 1.0; // Opacity (starts at 100%)
         this.color = color;
     }
@@ -164,6 +191,9 @@ class Asteroid {
 function startGame() {
     state.difficulty = ui.difficultySelect.value;
 
+    // Resume Audio Context (Browser requirement)
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+
     // Get selected operations
     const opCheckboxes = document.querySelectorAll('input[name="op"]');
     const selectedOps = [];
@@ -221,6 +251,11 @@ function togglePause() {
     }
 }
 
+function toggleMute() {
+    state.isMuted = !state.isMuted;
+    ui.muteBtn.innerText = state.isMuted ? "UNMUTE SOUND" : "MUTE SOUND";
+}
+
 function returnToMenu() {
     state.isPlaying = false;
     state.isPaused = false;
@@ -275,7 +310,7 @@ function gameLoop(timestamp) {
         const p = state.particles[i];
         p.update();
         p.draw();
-        
+
         // Remove dead particles
         if (p.life <= 0) {
             state.particles.splice(i, 1);
@@ -341,6 +376,7 @@ function checkAnswer() {
         for (let i = 0; i < 15; i++) {
             state.particles.push(new Particle(hitAsteroid.x, hitAsteroid.y, '#00f3ff'));
         }
+        playLaserSound();
 
         state.asteroids.splice(hitIndex, 1);
         state.score += 10;
@@ -360,3 +396,4 @@ document.getElementById('game-over-menu-btn').addEventListener('click', returnTo
 document.getElementById('pause-btn').addEventListener('click', togglePause);
 document.getElementById('resume-btn').addEventListener('click', togglePause);
 document.getElementById('menu-btn').addEventListener('click', returnToMenu);
+document.getElementById('mute-btn').addEventListener('click', toggleMute);
