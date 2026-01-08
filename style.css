@@ -51,7 +51,8 @@ canvas {
 
 #score-board,
 #lives-board,
-#high-score-board {
+#high-score-board,
+#streak-board {
     font-size: 20px;
     color: var(--text-color);
     font-weight: bold;
