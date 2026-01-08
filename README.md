@@ -8,14 +8,25 @@
 2. **Start:** Click "Start Mission" to begin.
 3. **Defend:** Asteroids will fall from the top of the screen. Each asteroid contains a math equation.
 4. **Shoot:** Type the numeric answer to the equation using your keyboard and press **ENTER**.
-5. **Pause:** Press **ESC** or click the pause button (II) if you need a break.
-6. **Survive:** If an asteroid hits the bottom of the screen, you lose a life. The game ends when you lose 3 lives.
+5. **Power-Ups:** Destroy colored asteroids to activate special effects like Shields, Slow Motion, and Explosions.
+6. **Pause:** Press **ESC** or click the pause button (II) if you need a break.
+7. **Survive:** If an asteroid hits the bottom of the screen, you lose a life. The game ends when you lose 3 lives.
 
 ## ⚙️ Features
 
-* **Customizable Difficulty:**
-  * *Speed:* Choose between Easy (Slow), Medium (Normal), or Hard (Fast).
+* **4 Difficulty Modes:**
+  * *Speed:* Choose between Easy, Medium, Hard, or Expert (Extreme).
   * *Operations:* Toggle specific math types: Addition, Subtraction, Multiplication, Division.
+* **Power-Up System:**
+  * 🟠 **Explosion (Orange):** Destroys all active asteroids.
+  * 🔵 **Freeze (Blue):** Stops time for 5 seconds.
+  * 🟡 **Shield (Yellow):** Protects the base for 10 seconds.
+  * 🟢 **Extra Life (Green):** Adds +1 to your lives.
+  * 🔴 **Slow Motion (Red):** Slows down time for 5 seconds.
+  * 🟣 **Double Points (Purple):** Earn 2x score for 10 seconds.
+* **Boss Battles:** Face a giant, tougher asteroid every 200 points.
+* **Streak System:** Build your streak to set the counter on fire and earn extra lives every 10 streak points.
+* **Audio:** Retro sound effects for shooting and explosions (with Mute option).
 * **Portrait Mode:** Optimized for a focused, mobile-style view.
 * **Pause System:** Pause and resume gameplay at any time.
 * **High Score System:** Saves your best score locally in your browser.
