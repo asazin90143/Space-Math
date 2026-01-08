@@ -304,6 +304,7 @@ function startGame() {
     // Update UI
     ui.score.innerText = '0';
     ui.streak.innerText = '0';
+    ui.streak.classList.remove('on-fire');
     ui.lives.innerText = '3';
     ui.input.innerText = '';
     ui.startScreen.classList.remove('active');
@@ -444,6 +445,7 @@ function gameLoop(timestamp) {
             state.lives--;
             state.streak = 0;
             ui.streak.innerText = 0;
+            ui.streak.classList.remove('on-fire');
             ui.lives.innerText = state.lives;
             state.asteroids.splice(i, 1); // Remove asteroid
 
@@ -589,6 +591,17 @@ function checkAnswer() {
         state.streak++;
         ui.streak.innerText = state.streak;
 
+        // Streak Bonus: Extra Life every 10
+        if (state.streak > 0 && state.streak % 10 === 0) {
+            state.lives++;
+            ui.lives.innerText = state.lives;
+        }
+
+        // Fire Effect if streak > 10
+        if (state.streak > 10) {
+            ui.streak.classList.add('on-fire');
+        }
+
         // Level Up Notification every 50 points
         if (state.score > 0 && state.score % 100 === 0) {
             showLevelUp();
@@ -599,6 +612,7 @@ function checkAnswer() {
         // MISS! (Optional: Penalty or just clear input)
         state.streak = 0;
         ui.streak.innerText = 0;
+        ui.streak.classList.remove('on-fire');
         state.currentInput = '';
     }
     ui.input.innerText = state.currentInput;
