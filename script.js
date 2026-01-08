@@ -430,9 +430,6 @@ window.addEventListener('keydown', (e) => {
     // Handle Numbers
     if (e.key >= '0' && e.key <= '9') {
         state.currentInput += e.key;
-    }    // Handle Negative sign (optional for hard mode, though we try to keep answers positive)
-    else if (e.key === '-' && state.currentInput.length === 0) {
-        state.currentInput += '-';
     }
     // Handle Backspace
     else if (e.key === 'Backspace') {
