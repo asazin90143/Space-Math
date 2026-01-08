@@ -23,6 +23,7 @@ const state = {
     isPlaying: false,
     isPaused: false,
     score: 0,
+    streak: 0,
     lives: 3,
     level: 1,
     currentInput: '',
@@ -67,6 +68,7 @@ const ui = {
     score: document.getElementById('score'),
     highScore: document.getElementById('high-score'),
     finalScore: document.getElementById('final-score'),
+    streak: document.getElementById('streak'),
     lives: document.getElementById('lives'),
     input: document.getElementById('current-input'),
     difficultySelect: document.getElementById('difficulty'),
@@ -286,6 +288,7 @@ function startGame() {
     state.ops = selectedOps.length > 0 ? selectedOps : ['+'];
 
     state.score = 0;
+    state.streak = 0;
     state.lives = 3;
     state.nextBossScore = 200;
     state.currentInput = '';
@@ -300,6 +303,7 @@ function startGame() {
 
     // Update UI
     ui.score.innerText = '0';
+    ui.streak.innerText = '0';
     ui.lives.innerText = '3';
     ui.input.innerText = '';
     ui.startScreen.classList.remove('active');
@@ -438,6 +442,8 @@ function gameLoop(timestamp) {
             }
 
             state.lives--;
+            state.streak = 0;
+            ui.streak.innerText = 0;
             ui.lives.innerText = state.lives;
             state.asteroids.splice(i, 1); // Remove asteroid
 
@@ -579,6 +585,10 @@ function checkAnswer() {
         state.score += points; // Bonus points for boss
         ui.score.innerText = state.score;
 
+        // Update Streak
+        state.streak++;
+        ui.streak.innerText = state.streak;
+
         // Level Up Notification every 50 points
         if (state.score > 0 && state.score % 100 === 0) {
             showLevelUp();
@@ -587,6 +597,8 @@ function checkAnswer() {
         state.currentInput = ''; // Clear input on success
     } else {
         // MISS! (Optional: Penalty or just clear input)
+        state.streak = 0;
+        ui.streak.innerText = 0;
         state.currentInput = '';
     }
     ui.input.innerText = state.currentInput;
