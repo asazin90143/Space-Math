@@ -55,7 +55,8 @@ const ui = {
     input: document.getElementById('current-input'),
     difficultySelect: document.getElementById('difficulty'),
     pauseBtn: document.getElementById('pause-btn'),
-    muteBtn: document.getElementById('mute-btn')
+    muteBtn: document.getElementById('mute-btn'),
+    levelUpMsg: document.getElementById('level-up-msg')
 };
 
 // Initialize High Score UI
@@ -403,12 +404,25 @@ function checkAnswer() {
         state.asteroids.splice(hitIndex, 1);
         state.score += 10;
         ui.score.innerText = state.score;
+
+        // Level Up Notification every 50 points
+        if (state.score > 0 && state.score % 100 === 0) {
+            showLevelUp();
+        }
+
         state.currentInput = ''; // Clear input on success
     } else {
         // MISS! (Optional: Penalty or just clear input)
         state.currentInput = '';
     }
     ui.input.innerText = state.currentInput;
+}
+
+function showLevelUp() {
+    // Reset animation
+    ui.levelUpMsg.classList.remove('active');
+    void ui.levelUpMsg.offsetWidth; // Trigger reflow to restart animation
+    ui.levelUpMsg.classList.add('active');
 }
 
 // Button Listeners
