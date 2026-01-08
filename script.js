@@ -53,11 +53,11 @@ const settings = {
 // Power-Up Configuration
 const powerUpTypes = [
     { type: 'explosion', color: '#FFA500', chance: 0.05 }, // Orange: Destroys all
-    { type: 'freeze', color: '#4488FF', chance: 0.10 },    // Blue: Stops time
-    { type: 'shield', color: '#FFD700', chance: 0.10 },    // Gold: Protects bottom
+    { type: 'freeze', color: '#0088FF', chance: 0.10 },    // Blue: Stops time
+    { type: 'shield', color: '#FFFF00', chance: 0.10 },    // Yellow: Protects bottom
     { type: 'life', color: '#00FF00', chance: 0.05 },      // Green: +1 Life
-    { type: 'slowMo', color: '#A020F0', chance: 0.10 },    // Purple: Slows time
-    { type: 'doublePoints', color: '#FF00FF', chance: 0.05 } // Pink: 2x Points
+    { type: 'slowMo', color: '#FF0000', chance: 0.10 },    // Red: Slows time
+    { type: 'doublePoints', color: '#800080', chance: 0.05 } // Purple: 2x Points
 ];
 
 // UI Elements
@@ -402,14 +402,14 @@ function gameLoop(timestamp) {
         }
     };
 
-    drawTimer("SHIELD", "#FFD700", state.shieldedUntil, 10000);
-    drawTimer("FREEZE", "#4488FF", state.frozenUntil, 5000);
-    drawTimer("SLOW MO", "#A020F0", state.slowMoUntil, 5000);
-    drawTimer("2X POINTS", "#FF00FF", state.doublePointsUntil, 10000);
+    drawTimer("SHIELD", "#FFFF00", state.shieldedUntil, 10000);
+    drawTimer("FREEZE", "#0088FF", state.frozenUntil, 5000);
+    drawTimer("SLOW MO", "#FF0000", state.slowMoUntil, 5000);
+    drawTimer("2X POINTS", "#800080", state.doublePointsUntil, 10000);
 
     // Shield Bottom Overlay
     if (now < state.shieldedUntil) {
-        ctx.fillStyle = 'rgba(255, 215, 0, 0.2)';
+        ctx.fillStyle = 'rgba(255, 255, 0, 0.2)';
         ctx.fillRect(0, canvas.height - 20, canvas.width, 20);
     }
 
