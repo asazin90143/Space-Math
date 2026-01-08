@@ -33,6 +33,7 @@ const state = {
     difficulty: 'easy',
     ops: ['+'], // Default
     isMuted: false,
+    nextBossScore: 200,
     highScore: localStorage.getItem('spaceMathHighScore') || 0
 };
 
@@ -64,11 +65,12 @@ ui.highScore.innerText = state.highScore;
 
 // --- Math Logic ---
 
-function generateProblem(difficulty) {
+function generateProblem(difficulty, isBoss = false) {
     const config = settings[difficulty];
     const operator = state.ops[Math.floor(Math.random() * state.ops.length)];
-    let num1 = Math.floor(Math.random() * config.maxNum) + 1;
-    let num2 = Math.floor(Math.random() * config.maxNum) + 1;
+    const max = isBoss ? config.maxNum * 2 + 10 : config.maxNum; // Harder for boss
+    let num1 = Math.floor(Math.random() * max) + 1;
+    let num2 = Math.floor(Math.random() * max) + 1;
     let answer = 0;
     let text = '';
 
@@ -85,15 +87,17 @@ function generateProblem(difficulty) {
             break;
         case '*':
             // Reduce maxNum for multiplication to keep it type-able
-            num1 = Math.floor(Math.random() * 12) + 1;
-            num2 = Math.floor(Math.random() * 12) + 1;
+            const mMax = isBoss ? 20 : 12;
+            num1 = Math.floor(Math.random() * mMax) + 1;
+            num2 = Math.floor(Math.random() * mMax) + 1;
             answer = num1 * num2;
             text = `${num1} * ${num2}`;
             break;
         case '/':
             // Create a multiplication first, then reverse it for division
-            num2 = Math.floor(Math.random() * 10) + 2; // Avoid divide by 1 or 0
-            answer = Math.floor(Math.random() * 10) + 1;
+            const dMax = isBoss ? 20 : 10;
+            num2 = Math.floor(Math.random() * dMax) + 2; // Avoid divide by 1 or 0
+            answer = Math.floor(Math.random() * dMax) + 1;
             num1 = num2 * answer;
             text = `${num1} ÷ ${num2}`;
             break;
@@ -176,14 +180,15 @@ class Particle {
 }
 
 class Asteroid {
-    constructor(difficulty) {
-        this.r = 15; // Radius (Smaller to look further away)
-        const problem = generateProblem(difficulty);
+    constructor(difficulty, isBoss = false) {
+        this.isBoss = isBoss;
+        this.r = isBoss ? 50 : 15; // Giant radius for boss
+        const problem = generateProblem(difficulty, isBoss);
         this.problemText = problem.text;
         this.answer = problem.answer;
 
         // Calculate text width to ensure it stays within bounds
-        ctx.font = 'bold 16px Courier New';
+        ctx.font = isBoss ? 'bold 24px Courier New' : 'bold 16px Courier New';
         const textWidth = ctx.measureText(this.problemText).width;
         const halfWidth = textWidth / 2;
         const padding = 10;
@@ -192,14 +197,25 @@ class Asteroid {
 
         this.x = Math.random() * (maxX - minX) + minX;
         this.y = -50;
-        this.speed = settings[difficulty].speed + (Math.random() * 0.5); // Slight variance
-        this.color = '#fff';
+        this.speed = isBoss ? 0.3 : settings[difficulty].speed + (Math.random() * 0.5); // Boss is slower
+        this.color = isBoss ? '#ff0055' : '#fff';
     }
 
     draw() {
+        if (this.isBoss) {
+            // Draw Boss Body
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+            ctx.fillStyle = '#2a0015';
+            ctx.fill();
+            ctx.strokeStyle = this.color;
+            ctx.lineWidth = 3;
+            ctx.stroke();
+        }
+
         // Draw Math Problem
-        ctx.fillStyle = '#00f3ff';
-        ctx.font = 'bold 16px Courier New';
+        ctx.fillStyle = this.isBoss ? '#ff0055' : '#00f3ff';
+        ctx.font = this.isBoss ? 'bold 24px Courier New' : 'bold 16px Courier New';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillText(this.problemText, this.x, this.y);
@@ -228,6 +244,7 @@ function startGame() {
 
     state.score = 0;
     state.lives = 3;
+    state.nextBossScore = 200;
     state.currentInput = '';
     state.asteroids = [];
     state.particles = [];
@@ -299,7 +316,13 @@ function gameLoop(timestamp) {
 
     // Spawn Asteroids
     if (timestamp - state.lastSpawnTime > state.spawnRate) {
-        state.asteroids.push(new Asteroid(state.difficulty));
+        // Check for Boss Spawn
+        if (state.score >= state.nextBossScore) {
+            state.asteroids.push(new Asteroid(state.difficulty, true));
+            state.nextBossScore += 200;
+        } else {
+            state.asteroids.push(new Asteroid(state.difficulty));
+        }
         state.lastSpawnTime = timestamp;
 
         // Increase difficulty slightly over time (speed up spawn rate)
@@ -396,13 +419,15 @@ function checkAnswer() {
         // HIT!
         // Spawn particles at the asteroid's position
         const hitAsteroid = state.asteroids[hitIndex];
-        for (let i = 0; i < 15; i++) {
-            state.particles.push(new Particle(hitAsteroid.x, hitAsteroid.y, '#00f3ff'));
+        const pCount = hitAsteroid.isBoss ? 50 : 15;
+        const pColor = hitAsteroid.isBoss ? '#ff0055' : '#00f3ff';
+        for (let i = 0; i < pCount; i++) {
+            state.particles.push(new Particle(hitAsteroid.x, hitAsteroid.y, pColor));
         }
         playLaserSound();
 
         state.asteroids.splice(hitIndex, 1);
-        state.score += 10;
+        state.score += hitAsteroid.isBoss ? 50 : 10; // Bonus points for boss
         ui.score.innerText = state.score;
 
         // Level Up Notification every 50 points
