@@ -43,7 +43,7 @@ const state = {
 const settings = {
     easy: { speed: 0.2, maxNum: 10 },   // Slower speed
     medium: { speed: 0.4, maxNum: 20 }, // Slower speed
-    hard: { speed: 8, maxNum: 30 },    // Slower speed
+    hard: { speed: 0.8, maxNum: 30 },    // Slower speed
     expert: { speed: 1, maxNum: 50 }    // Slower speed
 };
 
@@ -430,8 +430,7 @@ window.addEventListener('keydown', (e) => {
     // Handle Numbers
     if (e.key >= '0' && e.key <= '9') {
         state.currentInput += e.key;
-    }
-    // Handle Negative sign (optional for hard mode, though we try to keep answers positive)
+    }    // Handle Negative sign (optional for hard mode, though we try to keep answers positive)
     else if (e.key === '-' && state.currentInput.length === 0) {
         state.currentInput += '-';
     }
