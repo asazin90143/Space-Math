@@ -100,11 +100,20 @@ function generateProblem(difficulty) {
 class Asteroid {
     constructor(difficulty) {
         this.r = 15; // Radius (Smaller to look further away)
-        this.x = Math.random() * (canvas.width - 2 * this.r) + this.r;
-        this.y = -50;
         const problem = generateProblem(difficulty);
         this.problemText = problem.text;
         this.answer = problem.answer;
+
+        // Calculate text width to ensure it stays within bounds
+        ctx.font = 'bold 16px Courier New';
+        const textWidth = ctx.measureText(this.problemText).width;
+        const halfWidth = textWidth / 2;
+        const padding = 10;
+        const minX = halfWidth + padding;
+        const maxX = canvas.width - halfWidth - padding;
+
+        this.x = Math.random() * (maxX - minX) + minX;
+        this.y = -50;
         this.speed = settings[difficulty].speed + (Math.random() * 0.5); // Slight variance
         this.color = '#fff';
     }
