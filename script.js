@@ -123,6 +123,27 @@ function playLaserSound() {
     osc.stop(audioCtx.currentTime + 0.15);
 }
 
+function playExplosionSound() {
+    if (state.isMuted) return;
+
+    // Create oscillator for explosion/impact sound
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    osc.type = 'square'; // Grittier sound than sawtooth
+    osc.frequency.setValueAtTime(100, audioCtx.currentTime); // Start low
+    osc.frequency.exponentialRampToValueAtTime(10, audioCtx.currentTime + 0.3); // Drop lower
+
+    gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
+
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.3);
+}
+
 // --- Game Loop Functions ---
 
 // --- Particle System ---
@@ -297,6 +318,7 @@ function gameLoop(timestamp) {
             state.asteroids.splice(i, 1); // Remove asteroid
 
             // Visual feedback (screen flash red could go here)
+            playExplosionSound();
 
             if (state.lives <= 0) {
                 gameOver();
