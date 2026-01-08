@@ -43,7 +43,8 @@ const state = {
 const settings = {
     easy: { speed: 0.2, maxNum: 10 },   // Slower speed
     medium: { speed: 0.4, maxNum: 20 }, // Slower speed
-    hard: { speed: 8, maxNum: 50 }    // Slower speed
+    hard: { speed: 8, maxNum: 30 },    // Slower speed
+    expert: { speed: 1, maxNum: 50 }    // Slower speed
 };
 
 // Power-Up Configuration
@@ -208,7 +209,7 @@ class Asteroid {
         this.x = Math.random() * (maxX - minX) + minX;
         this.y = -50;
         this.speed = isBoss ? 0.3 : settings[difficulty].speed + (Math.random() * 0.5); // Boss is slower
-        
+
         // Determine Power-Up
         this.powerUp = null;
         if (!isBoss) {
@@ -223,7 +224,7 @@ class Asteroid {
                 }
             }
         }
-        
+
         // Set Default Colors if no power-up
         if (this.isBoss) {
             this.color = '#ff0055';
@@ -453,7 +454,7 @@ window.addEventListener('keydown', (e) => {
 
 function activatePowerUp(type) {
     const now = performance.now();
-    
+
     switch (type) {
         case 'explosion':
             // Destroy all non-boss asteroids
@@ -471,15 +472,15 @@ function activatePowerUp(type) {
             ui.score.innerText = state.score;
             playExplosionSound();
             break;
-            
+
         case 'freeze':
             state.frozenUntil = now + 5000; // 5 Seconds
             break;
-            
+
         case 'shield':
             state.shieldedUntil = now + 10000; // 10 Seconds
             break;
-            
+
         case 'life':
             state.lives++;
             ui.lives.innerText = state.lives;
