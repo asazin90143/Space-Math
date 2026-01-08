@@ -41,9 +41,9 @@ const state = {
 
 // Difficulty Settings
 const settings = {
-    easy: { speed: 0.3, maxNum: 10 },   // Slower speed
-    medium: { speed: 0.7, maxNum: 20 }, // Slower speed
-    hard: { speed: 1.2, maxNum: 50 }    // Slower speed
+    easy: { speed: 0.2, maxNum: 10 },   // Slower speed
+    medium: { speed: 0.4, maxNum: 20 }, // Slower speed
+    hard: { speed: 8, maxNum: 50 }    // Slower speed
 };
 
 // Power-Up Configuration
