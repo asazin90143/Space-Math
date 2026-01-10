@@ -44,14 +44,32 @@
                 <label><input type="checkbox" name="op" value="/"> Division (÷)</label>
             </div>
 
-            <button id="start-btn">START MISSION</button>
+            <div class="menu-buttons">
+                <button id="start-btn">START MISSION</button>
+                <button id="leaderboard-btn">LEADERBOARD</button>
+            </div>
         </div>
 
         <div id="game-over-screen" class="screen">
             <h1>GAME OVER</h1>
             <p>Final Score: <span id="final-score">0</span></p>
+
+            <div id="submit-score-container">
+                <input type="text" id="player-name" placeholder="ENTER YOUR NAME" maxlength="10">
+                <button id="submit-score-btn">SUBMIT SCORE</button>
+            </div>
+
             <button id="restart-btn">TRY AGAIN</button>
             <button id="game-over-menu-btn">MAIN MENU</button>
+        </div>
+
+        <div id="leaderboard-screen" class="screen">
+            <h1>TOP PILOTS</h1>
+            <div id="leaderboard-list">
+                <!-- Scores will be loaded here -->
+                <p>Loading...</p>
+            </div>
+            <button id="leaderboard-back-btn">BACK</button>
         </div>
 
         <div id="pause-screen" class="screen">

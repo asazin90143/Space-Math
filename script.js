@@ -74,7 +74,14 @@ const ui = {
     difficultySelect: document.getElementById('difficulty'),
     pauseBtn: document.getElementById('pause-btn'),
     muteBtn: document.getElementById('mute-btn'),
-    levelUpMsg: document.getElementById('level-up-msg')
+    levelUpMsg: document.getElementById('level-up-msg'),
+    leaderboardBtn: document.getElementById('leaderboard-btn'),
+    leaderboardScreen: document.getElementById('leaderboard-screen'),
+    leaderboardList: document.getElementById('leaderboard-list'),
+    leaderboardBackBtn: document.getElementById('leaderboard-back-btn'),
+    submitScoreBtn: document.getElementById('submit-score-btn'),
+    playerNameInput: document.getElementById('player-name'),
+    submitScoreContainer: document.getElementById('submit-score-container')
 };
 
 // Initialize High Score UI
@@ -325,6 +332,13 @@ function gameOver() {
         localStorage.setItem('spaceMathHighScore', state.highScore);
         ui.highScore.innerText = state.highScore;
     }
+
+    // Reset Submit UI
+    ui.submitScoreContainer.style.display = 'flex';
+    ui.playerNameInput.value = '';
+    ui.playerNameInput.disabled = false;
+    ui.submitScoreBtn.disabled = false;
+    ui.submitScoreBtn.innerText = 'SUBMIT SCORE';
 
     ui.finalScore.innerText = state.score;
     ui.gameOverScreen.classList.add('active');
@@ -647,3 +661,90 @@ document.getElementById('pause-btn').addEventListener('click', togglePause);
 document.getElementById('resume-btn').addEventListener('click', togglePause);
 document.getElementById('menu-btn').addEventListener('click', returnToMenu);
 document.getElementById('mute-btn').addEventListener('click', toggleMute);
+
+// --- Leaderboard Logic ---
+
+async function fetchLeaderboard() {
+    ui.leaderboardList.innerHTML = '<p>Loading scores...</p>';
+
+    try {
+        const res = await fetch('/api/scores');
+        if (!res.ok) throw new Error('Failed to fetch');
+        const scores = await res.json();
+
+        ui.leaderboardList.innerHTML = '';
+        if (scores.length === 0) {
+            ui.leaderboardList.innerHTML = '<p>No scores yet. Be the first!</p>';
+            return;
+        }
+
+        scores.forEach((entry, index) => {
+            const div = document.createElement('div');
+            div.className = 'leaderboard-entry';
+            div.innerHTML = `
+                <span class="leaderboard-rank">#${index + 1}</span>
+                <span class="leaderboard-name">${escapeHtml(entry.username)}</span>
+                <span class="leaderboard-score">${entry.score}</span>
+            `;
+            ui.leaderboardList.appendChild(div);
+        });
+    } catch (err) {
+        console.error(err);
+        ui.leaderboardList.innerHTML = '<p>Error loading scores. Is the server running?</p>';
+    }
+}
+
+async function submitScore() {
+    const name = ui.playerNameInput.value.trim();
+    if (!name) return alert("Please enter your name!");
+
+    ui.submitScoreBtn.disabled = true;
+    ui.submitScoreBtn.innerText = 'SENDING...';
+
+    try {
+        const res = await fetch('/api/scores', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                username: name,
+                score: state.score,
+                difficulty: state.difficulty
+            })
+        });
+
+        if (res.ok) {
+            ui.submitScoreBtn.innerText = 'SENT!';
+            ui.submitScoreContainer.style.display = 'none';
+        } else {
+            throw new Error('Failed to submit');
+        }
+    } catch (err) {
+        console.error(err);
+        ui.submitScoreBtn.innerText = 'ERROR';
+        ui.submitScoreBtn.disabled = false;
+    }
+}
+
+function escapeHtml(text) {
+    if (!text) return text;
+    return text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+// Leaderboard Event Listeners
+ui.leaderboardBtn.addEventListener('click', () => {
+    ui.startScreen.classList.remove('active');
+    ui.leaderboardScreen.classList.add('active');
+    fetchLeaderboard();
+});
+
+ui.leaderboardBackBtn.addEventListener('click', () => {
+    ui.leaderboardScreen.classList.remove('active');
+    ui.startScreen.classList.add('active');
+});
+
+ui.submitScoreBtn.addEventListener('click', submitScore);
