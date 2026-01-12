@@ -255,13 +255,27 @@ select {
 }
 
 .leaderboard-name {
+    display: block;
+    color: #fff;
+}
+
+.leaderboard-info {
     flex-grow: 1;
     text-align: left;
+    display: flex;
+    flex-direction: column;
+}
+
+.leaderboard-details {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.7);
+    margin-top: 4px;
 }
 
 .leaderboard-score {
     color: var(--neon-green);
     font-weight: bold;
+    align-self: center;
 }
 
 /* Input Styling */
