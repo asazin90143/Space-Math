@@ -683,7 +683,12 @@ async function fetchLeaderboard() {
             div.className = 'leaderboard-entry';
             div.innerHTML = `
                 <span class="leaderboard-rank">#${index + 1}</span>
-                <span class="leaderboard-name">${escapeHtml(entry.username)}</span>
+                <div class="leaderboard-info">
+                    <span class="leaderboard-name">${escapeHtml(entry.username)}</span>
+                    <span class="leaderboard-details">
+                        ${entry.difficulty || 'medium'} | ${entry.operations || '+'}
+                    </span>
+                </div>
                 <span class="leaderboard-score">${entry.score}</span>
             `;
             ui.leaderboardList.appendChild(div);
@@ -708,7 +713,8 @@ async function submitScore() {
             body: JSON.stringify({
                 username: name,
                 score: state.score,
-                difficulty: state.difficulty
+                difficulty: state.difficulty,
+                operations: state.ops
             })
         });
 
