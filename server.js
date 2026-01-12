@@ -27,9 +27,21 @@ const initDb = async () => {
                 username VARCHAR(50) NOT NULL,
                 score INTEGER NOT NULL,
                 difficulty VARCHAR(20),
+                operations VARCHAR(50),
                 date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
         `);
+
+        // Migration: Add operations column if it doesn't exist (for existing databases)
+        await pool.query(`
+            DO $$ 
+            BEGIN 
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='scores' AND column_name='operations') THEN 
+                    ALTER TABLE scores ADD COLUMN operations VARCHAR(50); 
+                END IF; 
+            END $$;
+        `);
+
         console.log('Database initialized successfully');
     } catch (err) {
         console.error('Error initializing database:', err);
@@ -52,17 +64,18 @@ app.get('/api/scores', async (req, res) => {
 
 // POST New Score
 app.post('/api/scores', async (req, res) => {
-    const { username, score, difficulty } = req.body;
-    
+    const { username, score, difficulty, operations } = req.body;
+
     // Basic validation
     if (!username || !score) {
         return res.status(400).json({ error: 'Username and score are required' });
     }
 
     try {
+        const opsString = Array.isArray(operations) ? operations.join(',') : (operations || '+');
         const result = await pool.query(
-            'INSERT INTO scores (username, score, difficulty) VALUES ($1, $2, $3) RETURNING *',
-            [username, score, difficulty || 'medium']
+            'INSERT INTO scores (username, score, difficulty, operations) VALUES ($1, $2, $3, $4) RETURNING *',
+            [username, score, difficulty || 'medium', opsString]
         );
         res.status(201).json(result.rows[0]);
     } catch (err) {

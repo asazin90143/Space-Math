@@ -3,5 +3,6 @@ CREATE TABLE IF NOT EXISTS scores (
     username VARCHAR(50) NOT NULL,
     score INTEGER NOT NULL,
     difficulty VARCHAR(20),
+    operations VARCHAR(50),
     date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
